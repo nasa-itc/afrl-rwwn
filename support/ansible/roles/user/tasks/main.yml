@@ -1,0 +1,13 @@
+---
+
+- name: install vscode extensions
+  command: 'code --install-extension {{item}}'
+  register: install_vscode_extension
+  args:
+    creates: '/home/{{afrl_user}}/.vscode/extensions/{{item}}-*'
+  loop:
+    - ms-vscode.cpptools
+    - ms-python.python
+    - ms-azuretools.vscode-docker
+    - redhat.ansible
+

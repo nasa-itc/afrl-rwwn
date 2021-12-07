@@ -1,0 +1,128 @@
+---
+
+- name: manage virtualbox user/groups
+  block:
+    - name: add user {{afrl_user}}
+      user:
+        state: present
+        name: '{{afrl_user}}'
+        password: $6$b1QTRT3WPbTn$YB3pWLhZD4NtBnkTYDo33FdwpQ8drMlgRyDS/aOtCW6zFhOcFS7w6LvvoxaxY0I3ib2HMfJB7I1r.hlTcR4G4/
+        groups: sudo
+        append: yes
+        create_home: yes
+        shell: /bin/bash
+
+    - name: add user {{afrl_user}} to vboxsf group
+      user:
+        name: '{{afrl_user}}'
+        groups: vboxsf
+        append: yes
+      when:
+        - ansible_facts['virtualization_role'] == "guest"
+        - ansible_facts['virtualization_type'] == "virtualbox"
+
+    - name: change vagrant user to system account
+      ini_file:
+        path: /var/lib/AccountsService/users/vagrant
+        section: User
+        option: SystemAccount
+        value: "true"
+        state: present
+        no_extra_spaces: yes
+      notify:
+        - restart lightdm
+  when:
+    - vagrant_provisioning is defined
+
+- name: verify user
+  block:
+    - name: verify that user {{afrl_user}} exists
+      user:
+        state: present
+        name: '{{afrl_user}}'
+      check_mode: yes
+      register: check_afrl_user
+
+    - name: fail on nonexistent afrl user
+      fail:
+        msg: user '{{afrl_user}}' does not exist
+      when: check_afrl_user is changed
+
+- name: add i386 multiarch support
+  block:
+    - name: get current foreign architectures
+      command: 'dpkg --print-foreign-architectures'
+      register: dpkg_foreign_archs
+      changed_when: false
+
+    - name: add i386 architecture
+      command: 'dpkg --add-architecture i386'
+      when: "'i386' not in dpkg_foreign_archs.stdout"
+      register: dpkg_add_arch
+
+- name: set timezone
+  timezone:
+    name: America/New_York
+
+- name: update apt package cache
+  apt: update_cache=yes
+  changed_when: false
+
+- name: install dev packages
+  package:
+    state: present
+    name:
+      - build-essential
+      - dos2unix
+      - gdb-multiarch
+      - ghex
+      - git
+      - git-gui
+      - git-lfs
+      - gitk
+      - meld
+      - net-tools
+      - pkg-config
+      - python3-pip
+      - python3-venv
+      - python-is-python3
+      - rlwrap
+      - tmux
+      - vim
+      - virtualenv
+
+- name: install docker
+  package:
+    state: present
+    name:
+      - docker.io
+      - docker-compose
+      - python3-docker
+
+- name: add user to docker group
+  user:
+    name: '{{afrl_user}}'
+    groups: docker
+    append: yes
+
+- name: install microsoft vscode
+  block:
+    - name: add microsoft apt key
+      apt_key:
+        url: https://packages.microsoft.com/keys/microsoft.asc
+        state: present
+
+    - name: add vscode repo
+      apt_repository:
+        repo: deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main
+        state: present
+        filename: vscode
+        mode: 0664
+
+    - name: install vscode
+      package:
+        update_cache: yes
+        state: present
+        name:
+          - visual-studio-code
+

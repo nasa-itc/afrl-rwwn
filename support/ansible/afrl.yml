@@ -1,0 +1,43 @@
+---
+
+- name: afrl
+  hosts: all
+
+  vars_prompt:
+    - name: afrl_user
+      prompt: username
+      private: no
+    - name: repo_source
+      prompt: source directory
+      default: '{{playbook_dir}}/../..'
+      private: no
+
+  roles:
+    - role: system
+      become: yes
+      tags: system
+    - role: user
+      become: yes
+      become_user: '{{afrl_user}}'
+      tags: user
+
+  pre_tasks:
+    - name: check requirements
+      block:
+        - name: check ansible version
+          assert:
+            that: ansible_version.full is version_compare('2.10', '>=')
+            fail_msg: "unsupported ansible version: {{ ansible_version }}"
+
+        - name: check supported os
+          assert:
+            that: (ansible_facts['distribution'] == "Ubuntu" and ansible_facts['distribution_major_version'] is version('20', '=='))
+            fail_msg: "unsupported os: {{ ansible_facts['distribution'] }} {{ ansible_facts['distribution_version'] }}"
+
+        - name: check architecture
+          assert:
+            that: ansible_architecture == "x86_64"
+            fail_msg: "unsupported architecture: {{ ansible_architecture }}"
+      tags:
+        - always
+

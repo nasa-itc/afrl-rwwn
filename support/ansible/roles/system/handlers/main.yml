@@ -1,0 +1,9 @@
+---
+- name: restart lightdm
+  service:
+    name: '{{item}}'
+    state: restarted
+  loop:
+    - accounts-daemon
+    - lightdm
+
