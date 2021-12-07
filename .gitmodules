@@ -1,0 +1,3 @@
+[submodule "xilinx-qemu"]
+	path = xilinx-qemu
+	url = https://github.com/nasa-itc/xilinx-qemu
