@@ -64,9 +64,10 @@
   timezone:
     name: America/New_York
 
-- name: update apt package cache
-  apt: update_cache=yes
-  changed_when: false
+- name: install updates
+  apt:
+    update_cache: yes
+    upgrade: dist
 
 - name: install dev packages
   package:
