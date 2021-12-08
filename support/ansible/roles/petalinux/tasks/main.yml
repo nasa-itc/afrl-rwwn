@@ -1,0 +1,14 @@
+---
+
+- name: install petalinux dependencies
+  package:
+    state: present
+    name:
+      - build-essential
+      - autoconf
+      - automake
+      - gcc-multilib
+      - libtool
+      - texinfo
+      - zlib1g:i386
+

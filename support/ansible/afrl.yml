@@ -20,6 +20,9 @@
       become: yes
       become_user: '{{afrl_user}}'
       tags: user
+    - role: petalinux
+      become: yes
+      tags: petalinux
 
   pre_tasks:
     - name: check requirements
