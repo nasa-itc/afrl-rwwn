@@ -8,7 +8,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     config.vm.box = "itc/itc-ubuntu-mate-20.04-amd64"
     config.vm.box_version = "= 1.0.0"
     config.vm.box_download_checksum_type = "sha256"
-    config.vm.box_download_checksum = "29e6097944880489764c3e417c1a8c3d2a6d2724aaf06a71fb89d0e99b804711"
+    config.vm.box_download_checksum = "dc566ba5bffdfc46988f938784b46596e63269222509c4d97802a78681ae0da7"
     config.vm.hostname = "afrl-vm"
     config.vm.provider "virtualbox" do |vb|
         vb.name = "AFRL-RWWN"
