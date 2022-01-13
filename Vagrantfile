@@ -26,9 +26,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     end
 
     config.vm.provision "ansible_local" do |ansible|
-        ansible.inventory_path = "support/ansible/hosts"
+        ansible.inventory_path = "ansible/hosts"
         ansible.limit = "localhost"
-        ansible.playbook = "support/ansible/afrl.yml"
+        ansible.playbook = "ansible/afrl.yml"
         ansible.extra_vars = {
             afrl_source: "/vagrant",
             afrl_user: "itc",
