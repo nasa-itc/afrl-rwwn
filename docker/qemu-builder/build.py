@@ -4,25 +4,12 @@ import sys
 import shutil
 import argparse
 import subprocess
-import textwrap
 from pathlib import Path
 
-REPO_ROOT = Path("/src")
-QEMU_SOURCE_DIR = Path(REPO_ROOT, "xilinx-qemu")
-QEMU_BUILD_DIR = Path("/build")
-QEMU_INSTALL_DIR = Path(QEMU_SOURCE_DIR, "install")
-
-def print_env(cmd, *args):
-    """print environment for debugging"""
-    print(textwrap.dedent(f"""
-          ----------------------------------------
-          > REPO_ROOT         = {REPO_ROOT}
-          > QEMU_SOURCE_DIR   = {QEMU_SOURCE_DIR}
-          > QEMU_INSTALL_DIR  = {QEMU_INSTALL_DIR}
-          > COMMAND           = {cmd}
-          > ARGS              = {" ".join(args)}
-          ----------------------------------------
-    """))
+QEMU_ROOT = Path("/qemu")
+QEMU_SOURCE_DIR = Path(QEMU_ROOT, "src/xilinx-qemu")
+QEMU_BUILD_DIR = Path(QEMU_ROOT, "build")
+QEMU_INSTALL_DIR = Path(QEMU_SOURCE_DIR, "build")
 
 def clean_dir(path):
     """clean directory"""
@@ -40,6 +27,7 @@ def clean_dir(path):
 def update_ownership(path, refpath=QEMU_SOURCE_DIR):
     """update path ownership to match reference path"""
     stat = refpath.stat()
+    shutil.chown(path, user=stat.st_uid, group=stat.st_gid)
     for item in path.glob("**/*"):
         shutil.chown(item, user=stat.st_uid, group=stat.st_gid)
 
@@ -128,6 +116,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # dispatch build command
-    print_env(args.cmd, *args.args)
     cmds[args.cmd](*args.args)
+
 
