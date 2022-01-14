@@ -1,0 +1,39 @@
+version: '3.4'
+
+services:
+  xilinx-zcu106-pmu:
+    build: ./qemu
+    image: itc/qemu
+    command: "qemu-system-microblazeel -readconfig zcu106/config/zcu106_pmu.cfg
+                                       -machine-path /tmp/qemu-shm
+                                       -serial mon:stdio
+                                       -serial /dev/null
+                                       -display none"
+    stdin_open: true
+    tty: true
+    volumes:
+      - ../xilinx-qemu/build:/qemu
+      - ../zcu106:/qemu/zcu106
+      - qemu-shm:/tmp/qemu-shm
+
+  xilinx-zcu106:
+    build: ./qemu
+    image: itc/qemu
+    command: "qemu-system-aarch64 -readconfig zcu106/config/zcu106.cfg
+                                  -machine-path /tmp/qemu-shm
+                                  -serial mon:stdio
+                                  -serial /dev/null
+                                  -display none"
+    stdin_open: true
+    tty: true
+    network_mode: host
+    volumes:
+      - ../xilinx-qemu/build:/qemu
+      - ../zcu106:/qemu/zcu106
+      - qemu-shm:/tmp/qemu-shm
+    depends_on:
+      - xilinx-zcu106-pmu
+
+volumes:
+  qemu-shm:
+
