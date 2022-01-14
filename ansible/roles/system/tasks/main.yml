@@ -102,6 +102,12 @@
       - docker-compose
       - python3-docker
 
+- name: install qemu dependencies
+  package:
+    state: present
+    name:
+      - libaio1
+
 - name: add user to docker group
   user:
     name: '{{afrl_user}}'
