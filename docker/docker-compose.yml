@@ -19,7 +19,7 @@ services:
   xilinx-zcu106:
     build: ./qemu
     image: itc/qemu
-    command: "qemu-system-aarch64 -readconfig zcu106/config/zcu106.cfg
+    command: "qemu-system-aarch64 -readconfig ${QEMU_CONFIG_FILE}
                                   -machine-path /tmp/qemu-shm
                                   -serial mon:stdio
                                   -serial /dev/null
