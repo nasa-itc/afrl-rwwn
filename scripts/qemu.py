@@ -2,6 +2,7 @@
 
 import argparse
 import subprocess
+import multiprocessing as mp 
 from pathlib import Path
 
 import docker
@@ -11,6 +12,7 @@ REPO_ROOT = Path(__file__, "../..").resolve()
 QEMU_RUNNER_IMAGE = "itc/qemu"
 QEMU_BUILDER_IMAGE = "itc/qemu-builder"
 QEMU_BUILD_CACHE_VOLUME = "qemu-build-cache"
+processes=[]
 
 def build_docker_image(tag, path):
     """build qemu docker image if it doesn't exist"""
@@ -60,12 +62,19 @@ def run_qemu(tag=QEMU_RUNNER_IMAGE, instances=1, args=[]):
     build_docker_image(tag, docker_path)
     # run qemu
     try:
-        docker_path = docker_path / ".." 
         for i in range(instances):
-            subprocess.run(["docker-compose", "-p", str(i), "up", "--detach"], cwd=docker_path)
-            subprocess.run(["mate-terminal", "-t", f"{i}: zcu106", "-e", f"docker attach {i}_xilinx-zcu106_1"])
+            p = mp.Process(target=run_qemu_instance, args=(i,))
+            p.start()        
+            processes.append(p)  # Keep list of processes (maybe just pids?) to clean up later?
     except KeyboardInterrupt:
         pass
+
+def run_qemu_instance(i):
+    docker_path = Path(REPO_ROOT, "docker/qemu")
+    docker_path = docker_path / ".." 
+    subprocess.run(["docker-compose", "-p", str(i), "up", "--detach"], cwd=docker_path)
+    subprocess.run(["mate-terminal", "-t", f"{i}: zcu106", "-e", f"docker attach {i}_xilinx-zcu106_1"])
+
 
 def stop_qemu(instances=1, args=[]):
     """stop all docker services and cleanup resources"""
@@ -73,9 +82,13 @@ def stop_qemu(instances=1, args=[]):
     for i in range(instances):
         #subprocess.run(["docker-compose", "-p", str(i), "down"], cwd=docker_path)
         subprocess.run(["docker-compose", "-p", str(i), "down", "--volumes"], cwd=docker_path)
+    for p in processes:
+        print(f"Process {p.pid()} is being joined") #  Doesn't work if script is called from separate shell but could work if this is used as class?
+        p.join()
 
 if __name__ == "__main__":
     """main qemu launcher script"""
+    mp.set_start_method('spawn')
     # main parser
     parser = argparse.ArgumentParser(description="qemu launcher")
     sp = parser.add_subparsers(title="subcommands", dest="cmd", required=True)
