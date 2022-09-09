@@ -21,6 +21,7 @@ services:
     image: itc/qemu
     command: "qemu-system-aarch64 -readconfig ${QEMU_CONFIG_FILE}
                                   -machine-path /tmp/qemu-shm
+                                  -drive if=sd,format=raw,index=1,file=${ROOT_IMAGE_FILE}
                                   -serial mon:stdio
                                   -serial /dev/null
                                   -display none"
