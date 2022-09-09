@@ -1,3 +1,6 @@
 [submodule "xilinx-qemu"]
 	path = xilinx-qemu
 	url = https://github.com/nasa-itc/xilinx-qemu
+[submodule "afrl-zcu106-gui"]
+	path = afrl-zcu106-gui
+	url = https://github.com/nasa-itc/afrl-zcu106-gui.git
