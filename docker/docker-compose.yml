@@ -11,6 +11,8 @@ services:
                                        -display none"
     stdin_open: true
     tty: true
+    #    networks:
+    #  afrlnet:
     volumes:
       - ../xilinx-qemu/build:/qemu
       - ../zcu106:/qemu/zcu106
@@ -27,6 +29,10 @@ services:
                                   -display none"
     stdin_open: true
     tty: true
+    cap_add:
+      - NET_ADMIN
+    devices:
+    - "/dev/net/tun:/dev/net/tun"    
     network_mode: host
     volumes:
       - ../xilinx-qemu/build:/qemu
@@ -34,7 +40,6 @@ services:
       - qemu-shm:/tmp/qemu-shm
     depends_on:
       - xilinx-zcu106-pmu
-
 volumes:
   qemu-shm:
 
