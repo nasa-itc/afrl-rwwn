@@ -71,7 +71,7 @@ def run_qemu(tag=QEMU_RUNNER_IMAGE, instances=1, args=[]):
 def run_qemu_instance(i):
     docker_path = Path(REPO_ROOT, "docker/qemu")
     docker_path = docker_path / ".." 
-    subprocess.run(["docker-compose", "-p", str(i), "--env-file","tap.env","up","--detach"], cwd=docker_path)
+    subprocess.run(["docker-compose", "-p", str(i), "--env-file",".env","up","--detach"], cwd=docker_path)
     subprocess.run(["mate-terminal", "-t", f"{i}: zcu106", "-e", f"docker attach {i}_xilinx-zcu106_1"])
 
 
